@@ -1,18 +1,60 @@
+import useInput from '@hooks/useInput';
 import React, { useCallback, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Form, Label, Input, LinkContainer, Button, Header } from './styles';
+import { Link, Redirect } from 'react-router-dom';
+import axios from 'axios';
+import { Form, Label, Input, LinkContainer, Button, Header, Error, Success } from './styles';
+import useSWR from 'swr';
+import fetcher from '@utils/fetcher';
 
 const SignUp = () => {
-  const [email] = useState('');
-  const [nickname] = useState('');
-  const [password] = useState('');
-  const [passwordCheck] = useState('');
+  const { data, error, revalidate, mutate } = useSWR('/api/users', fetcher);
+
+  const [email, onChangeEmail, setEmail] = useInput('');
+  const [nickname, onChangeNickname, setNickname] = useInput('');
+  const [password, setPassword] = useState('');
+  const [passwordCheck, setPasswordCheck] = useState('');
+
+  const [mismatchError, setMismatchError] = useState(false);
+  const [signUpError, setSignUpError] = useState('');
+
+  const [signUpSuccess, setSignupSuccess] = useState(false);
   
-  const onSubmit = useCallback(() => {}, []);
-  const onChangeEmail = useCallback(() => {}, []);
-  const onChangeNickname = useCallback(() => {}, []);
-  const onChangePassword = useCallback(() => {}, []);
-  const onChangePasswordCheck = useCallback(() => {}, []);
+  const onSubmit = useCallback((e) => {
+    e.preventDefault();
+    if (!mismatchError) {
+      console.log('가입 가능');
+      setSignUpError('');
+      axios.post('/api/users', {
+        email, nickname, password,
+      })
+        .then((response) => {
+          console.log(response);
+          setSignupSuccess(true);
+        })
+        .catch((error) => {
+          console.log(error.response);
+          setSignUpError(error.response.data);
+        })
+        .finally(() => {});
+    }
+  }, [email, nickname, password, passwordCheck]);
+  
+  const onChangePassword = useCallback((e) => {
+    setPassword(e.target.value);
+    setMismatchError(e.target.value !== passwordCheck);
+  }, [passwordCheck]);
+  const onChangePasswordCheck = useCallback((e) => {
+    setPasswordCheck(e.target.value);
+    setMismatchError(e.target.value !== password);
+  }, [password]);
+
+  if (data === undefined) {
+    return <div>로딩중...</div>;
+  }
+
+  if (data) {
+    return <Redirect to="/workspace/channel" />;
+  }
 
   return (
     <div id="container">
@@ -47,10 +89,10 @@ const SignUp = () => {
               onChange={onChangePasswordCheck}
             />
           </div>
-          {/* {mismatchError && <Error>비밀번호가 일치하지 않습니다.</Error>}
+          {mismatchError && <Error>비밀번호가 일치하지 않습니다.</Error>}
           {!nickname && <Error>닉네임을 입력해주세요.</Error>}
           {signUpError && <Error>{signUpError}</Error>}
-          {signUpSuccess && <Success>회원가입되었습니다! 로그인해주세요.</Success>} */}
+          {signUpSuccess && <Success>회원가입되었습니다! 로그인해주세요.</Success>}
         </Label>
         <Button type="submit">회원가입</Button>
       </Form>
