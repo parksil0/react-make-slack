@@ -10,6 +10,7 @@ import ChatList from '@components/ChatList';
 import useInput from '@hooks/useInput';
 import axios from 'axios';
 import { IDM } from '@typings/db';
+import makeSection from '@utils/makeSection';
 
 const DirectMessage = () => {
   const { workspace, id } = useParams<{ workspace: string, id: string }>();
@@ -17,18 +18,14 @@ const DirectMessage = () => {
   const { data: userData } = useSWR(`/api/workspaces/${workspace}/users/${id}`, fetcher);
   const { data: myData } = useSWR('/api/users', fetcher);
   const { data: chatData, mutate: mutateChat, revalidate } = useSWR<IDM[]>(
-    `/api/workspaces/${workspace}/dms/${id}/chats?perPage=20&page=$1`, fetcher
+    `/api/workspaces/${workspace}/dms/${id}/chats?perPage=20&page=1`, fetcher
   )
 
   const [chat, onChangeChat, setChat] = useInput('');
 
   const onSubmitForm = useCallback((e) => {
     e.preventDefault();
-    console.log(e.target.value);
-    
     if (chat?.trim()) {
-      console.log(chat);
-      
       axios.post(`/api/workspaces/${workspace}/dms/${id}/chats`, {
         content: chat,
       })
@@ -38,11 +35,13 @@ const DirectMessage = () => {
         })
         .catch(console.error);
     }
-  }, [chat]);
+  }, [chat, chatData, mutateChat, myData, userData]);
 
   if (!userData || !myData ) {
     return null;
   }
+
+  const chatSections = [makeSection(chatData ? [...chatData].reverse() : [])]
 
   return (
     <Container>
@@ -50,8 +49,8 @@ const DirectMessage = () => {
         <img src={gravatar.url(userData.email, { s: '24px', d:'retro' })} alt={userData.nickname} />
         <span>{userData.nickname}</span>
       </Header>
-      <ChatList />
-      <ChatBox chat={""} onChangeChat={onChangeChat} onSubmitForm={onSubmitForm} />
+      <ChatList chatSections={chatSections} />
+      <ChatBox chat={chat} onChangeChat={onChangeChat} onSubmitForm={onSubmitForm} />
     </Container>
   )
 }
