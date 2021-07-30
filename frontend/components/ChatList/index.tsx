@@ -1,6 +1,6 @@
 import Chat from '@components/Chat';
 import { IDM } from '@typings/db';
-import React, { useCallback, useRef, VFC } from 'react';
+import React, { useCallback, useEffect, useRef, VFC } from 'react';
 import { ChatZone, Section, StickyHeader } from './styles';
 import { Scrollbars } from 'react-custom-scrollbars'
 
@@ -10,7 +10,12 @@ interface Props {
 
 const ChatList: VFC<Props> = ({ chatSections }) => {
   const scollbarRef = useRef(null);
-  const onScroll = useCallback(() => {}, []);
+  const onScroll = useCallback((values) => {
+    if (values.scrollTop === 0) {
+      console.log('최상단');
+    }
+  }, []);
+
   return (
     <ChatZone>
       <Scrollbars autoHide ref={scollbarRef} onScrollFrame={onScroll} >
@@ -21,13 +26,16 @@ const ChatList: VFC<Props> = ({ chatSections }) => {
                 <button>{date}</button>
               </StickyHeader>
               {chats.map((chat) => {
-                <Chat key={chat.id} data={chat} />
+                return (
+                  <Chat key={chat.id} data={chat} />
+                )
               })}
             </Section>
-          )
-        })}
+          );
+        })};
       </Scrollbars>
     </ChatZone>
+    
     
   )
 }
