@@ -21,7 +21,7 @@ const CreateChannelModal: FC<Props> = ({ show, onCloseModal, setShowCreateChanne
   const { data: userData, error, revalidate, mutate } = useSWR<IUser | false>('/api/users', fetcher);
   const { data: channelData, revalidate: revalidateChannel } = useSWR<IChannel[]>(userData ? `/api/workspaces/${workspace}/channels` : null, fetcher)
 
-  console.log(channelData, userData);
+  // console.log(channelData, userData);
 
   const [newChannel, onChangeNewChannel, setNewChannel] = useInput('');
 
