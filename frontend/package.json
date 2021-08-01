@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "TS_NODE_PROJECT=\"tsconfig-for-webpack-config.json\" webpack serve --env development",
-    "build": "TS_NODE_PROJECT=\"tsconfig-for-webpack-config.json\" webpack",
+    "dev": "cross-env TS_NODE_PROJECT=\"tsconfig-for-webpack-config.json\" webpack serve --env development",
+    "build": "cross-env NODE_ENV=production TS_NODE_PROJECT=\"tsconfig-for-webpack-config.json\" webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "seal park",
@@ -21,6 +21,7 @@
     "@types/react-dom": "^17.0.9",
     "autosize": "^5.0.1",
     "axios": "^0.21.1",
+    "cross-env": "^7.0.3",
     "css-loader": "^6.2.0",
     "dayjs": "^1.10.6",
     "gravatar": "^1.8.1",
@@ -36,7 +37,8 @@
     "socket.io-client": "^2.4.0",
     "style-loader": "^3.2.1",
     "swr": "^0.5.6",
-    "typescript": "^4.3.5"
+    "typescript": "^4.3.5",
+    "webpack-bundle-analyzer": "^4.4.2"
   },
   "devDependencies": {
     "@babel/core": "^7.14.8",
@@ -51,6 +53,7 @@
     "@types/react-router-dom": "^5.1.8",
     "@types/socket.io-client": "^1.4.35",
     "@types/webpack": "^5.28.0",
+    "@types/webpack-bundle-analyzer": "^4.4.1",
     "@types/webpack-dev-server": "^3.11.1",
     "babel-loader": "^8.2.2",
     "eslint": "^7.31.0",
